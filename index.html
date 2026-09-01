@@ -576,7 +576,7 @@
                             <i data-lucide="presentation" class="w-4 h-4 text-emerald-200"></i> 黑　板
                         </div>
 
-                        <!-- Cadres & Assistants Section (Directly linked with Tab 2) -->
+                        <!-- Cadres & Assistants Section -->
                         <div id="cadresSection" class="w-full bg-amber-50/40 border border-amber-200 rounded-xl p-1.5 mt-1 space-y-1 shadow-2xs">
                             
                             <!-- Row 1: 班級幹部列 -->
@@ -614,10 +614,9 @@
         </div>
 
         <!-- =========================================================================
-             TAB 2: 班級幹部與科目小老師安排 (Structured Role Assignment)
+             TAB 2: 班級幹部與科目小老師安排
              ========================================================================= -->
         <div id="tabContent-cadres" class="tab-pane hidden flex flex-col gap-4">
-            
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
                     <div>
@@ -636,10 +635,7 @@
                     </div>
                 </div>
 
-                <!-- Dual Columns: 班級幹部 (Left) & 學科小老師 (Right) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    <!-- Section A: 班級幹部 -->
                     <div class="bg-amber-50/40 border border-amber-200 rounded-xl p-4 space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-sm text-amber-950 flex items-center gap-1.5">
@@ -649,11 +645,9 @@
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增幹部職務
                             </button>
                         </div>
-                        
                         <div id="cadresListContainer" class="space-y-2 max-h-[550px] overflow-y-auto pr-1"></div>
                     </div>
 
-                    <!-- Section B: 學科小老師 -->
                     <div class="bg-emerald-50/40 border border-emerald-200 rounded-xl p-4 space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="font-bold text-sm text-emerald-950 flex items-center gap-1.5">
@@ -663,13 +657,10 @@
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增小老師
                             </button>
                         </div>
-
                         <div id="assistantsListContainer" class="space-y-2 max-h-[550px] overflow-y-auto pr-1"></div>
                     </div>
-
                 </div>
             </div>
-
         </div>
 
         <!-- =========================================================================
@@ -677,151 +668,135 @@
              ========================================================================= -->
         <div id="tabContent-duty" class="tab-pane hidden flex flex-col gap-4">
             
-            <!-- Screen View for Duty Schedule -->
             <div class="duty-screen-view bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
                     <div>
                         <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                            <i data-lucide="calendar" class="w-5 h-5 text-sky-600"></i> 值日生與抬餐學生排班管理
+                            <i data-lucide="calendar" class="w-5 h-5 text-sky-600"></i> 值日生與抬餐學生輪值安排
                         </h2>
-                        <p class="text-xs text-slate-500 mt-0.5">支援月份/日期區間排班、特定放假日鎖定、自訂排除學生、同性別值日及 A4 輪值行事曆列印。</p>
+                        <p class="text-xs text-slate-500 mt-0.5">支援自訂日期區間/按月輪派，可排除學生、設定同性別值日，並可手動鎖定放假或微調人員。</p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
-                        <button onclick="executeDutyScheduling()" class="text-xs bg-sky-600 hover:bg-sky-700 text-white font-bold px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow">
-                            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 執行自動輪派排班
+                        <button onclick="executeDutyScheduling()" class="text-xs bg-sky-600 hover:bg-sky-700 text-white font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow">
+                            <i data-lucide="play" class="w-4 h-4"></i> 自動產生排班月曆
                         </button>
-                        <button onclick="printDutySheet()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-1.5 rounded-lg transition flex items-center gap-1.5 shadow">
-                            <i data-lucide="printer" class="w-4 h-4"></i> 列印輪值行事曆 (A4)
+                        <button onclick="openDutyExclusionModal()" class="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 px-3 py-2 rounded-lg font-bold transition flex items-center gap-1 shadow-2xs">
+                            <i data-lucide="user-x" class="w-3.5 h-3.5"></i> 設定排除學生名單
+                        </button>
+                        <button onclick="printDutySheet()" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3.5 py-2 rounded-lg transition flex items-center gap-1.5 shadow">
+                            <i data-lucide="printer" class="w-4 h-4"></i> 列印輪值表 (A4 大字)
                         </button>
                     </div>
                 </div>
 
-                <!-- Duty Settings Panel -->
-                <div class="bg-sky-50/50 border border-sky-200 rounded-xl p-3.5 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                    
-                    <!-- Setting 1: Range / Month Selection -->
-                    <div class="space-y-1.5">
-                        <label class="font-bold text-sky-950 block">1. 排班日期範圍</label>
+                <!-- Duty Controls Bar -->
+                <div class="bg-sky-50/40 border border-sky-200 rounded-xl p-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <div>
+                        <label class="font-bold text-sky-950 mb-1 block">1. 排班區間模式</label>
                         <div class="flex items-center gap-2">
-                            <select id="dutyRangeModeSelect" onchange="changeDutyRangeMode(this.value)" class="px-2 py-1 border border-slate-300 rounded text-xs bg-white font-medium">
+                            <select id="dutyRangeModeSelect" onchange="changeDutyRangeMode(this.value)" class="px-2 py-1.5 border border-slate-300 rounded-lg text-xs bg-white focus:ring-1 focus:ring-sky-500 font-medium">
                                 <option value="month">按月份排班</option>
-                                <option value="range">自訂日期區間</option>
+                                <option value="customRange">自訂日期區間</option>
                             </select>
                         </div>
-                        <div id="dutyMonthPickerBox" class="flex items-center gap-1.5 pt-1">
-                            <input type="number" id="dutyYearInput" value="2026" min="2024" max="2035" onchange="updateDutySettings()" class="w-16 px-1.5 py-0.5 border border-slate-300 rounded text-xs text-center bg-white font-bold">
-                            <span class="text-slate-600 font-bold">年</span>
-                            <select id="dutyMonthInput" onchange="updateDutySettings()" class="px-2 py-0.5 border border-slate-300 rounded text-xs bg-white font-bold">
-                                ${[1,2,3,4,5,6,7,8,9,10,11,12].map(m => `<option value="${m}" ${m===9?'selected':''}>${m} 月</option>`).join('')}
-                            </select>
+                    </div>
+
+                    <div id="dutyMonthPickerBox" class="space-y-1">
+                        <label class="font-bold text-sky-950 block">月份選擇</label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="number" id="dutyYearInput" value="2026" min="2020" max="2035" onchange="updateDutySettings()" class="w-16 px-2 py-1 border rounded text-xs font-bold text-center bg-white">
+                            <span>年</span>
+                            <input type="number" id="dutyMonthInput" value="9" min="1" max="12" onchange="updateDutySettings()" class="w-14 px-2 py-1 border rounded text-xs font-bold text-center bg-white">
+                            <span>月</span>
                         </div>
-                        <div id="dutyCustomRangeBox" class="hidden flex items-center gap-1 pt-1">
-                            <input type="date" id="dutyStartDateInput" value="2026-09-01" onchange="updateDutySettings()" class="px-1.5 py-0.5 border border-slate-300 rounded text-xs bg-white">
+                    </div>
+
+                    <div id="dutyCustomRangeBox" class="hidden space-y-1">
+                        <label class="font-bold text-sky-950 block">自訂日期範圍</label>
+                        <div class="flex items-center gap-1">
+                            <input type="date" id="dutyStartDateInput" value="2026-09-01" onchange="updateDutySettings()" class="px-1.5 py-1 border rounded text-xs bg-white">
                             <span>至</span>
-                            <input type="date" id="dutyEndDateInput" value="2026-09-30" onchange="updateDutySettings()" class="px-1.5 py-0.5 border border-slate-300 rounded text-xs bg-white">
+                            <input type="date" id="dutyEndDateInput" value="2026-09-30" onchange="updateDutySettings()" class="px-1.5 py-1 border rounded text-xs bg-white">
                         </div>
                     </div>
 
-                    <!-- Setting 2: Capacity & Gender Rules -->
-                    <div class="space-y-1.5">
-                        <label class="font-bold text-sky-950 block">2. 每日人數與配對規則</label>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <span class="text-[10px] text-slate-500 block">每日值日生人數</span>
-                                <input type="number" id="dutyCapacityInput" value="2" min="1" max="5" onchange="updateDutySettings()" class="w-full px-2 py-0.5 border border-slate-300 rounded text-xs bg-white font-bold">
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-500 block">每日抬餐人數</span>
-                                <input type="number" id="mealCapacityInput" value="2" min="1" max="5" onchange="updateDutySettings()" class="w-full px-2 py-0.5 border border-slate-300 rounded text-xs bg-white font-bold">
-                            </div>
+                    <div>
+                        <label class="font-bold text-sky-950 mb-1 block">2. 每日需求人數</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-600">值日生：</span>
+                            <input type="number" id="dutyCapacityInput" value="2" min="1" max="6" onchange="updateDutySettings()" class="w-12 px-1.5 py-1 border rounded text-xs font-bold text-center bg-white">
+                            <span class="text-slate-600">抬餐：</span>
+                            <input type="number" id="mealCapacityInput" value="2" min="1" max="6" onchange="updateDutySettings()" class="w-12 px-1.5 py-1 border rounded text-xs font-bold text-center bg-white">
                         </div>
-                        <label class="inline-flex items-center gap-1.5 cursor-pointer pt-0.5">
-                            <input type="checkbox" id="dutySameGenderToggle" onchange="updateDutySettings()" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <span class="text-[11px] text-slate-700 font-medium">值日生設定同性別進行安排 (男男/女女)</span>
-                        </label>
                     </div>
 
-                    <!-- Setting 3: Method, Weekends & Exclusion Selector -->
-                    <div class="space-y-1.5">
-                        <label class="font-bold text-sky-950 block">3. 輪派方式與排除學生</label>
-                        <select id="dutyAssignmentMethod" onchange="updateDutySettings()" class="w-full px-2 py-1 border border-slate-300 rounded text-xs bg-white font-medium">
+                    <div>
+                        <label class="font-bold text-sky-950 mb-1 block">3. 排班原則與輪派方式</label>
+                        <select id="dutyAssignmentMethod" onchange="updateDutySettings()" class="w-full px-2 py-1.5 border border-slate-300 rounded-lg text-xs bg-white font-medium focus:ring-1 focus:ring-sky-500">
                             <option value="sequence">依學生座號順序輪值</option>
-                            <option value="random">完全隨機抽派</option>
+                            <option value="random">隨機抽派</option>
                         </select>
-
-                        <!-- Starting Seat Number Selectors for Sequence Rotation -->
-                        <div id="dutyStartNumbersContainer" class="grid grid-cols-2 gap-1.5 pt-0.5">
-                            <div>
-                                <span class="text-[10px] text-slate-500 block">值日生起始座號</span>
-                                <select id="dutyStartNumberSelect" onchange="updateDutySettings()" class="w-full px-1.5 py-0.5 border border-slate-300 rounded text-xs bg-white font-bold text-slate-800">
-                                    <option value="1">1號</option>
-                                </select>
-                            </div>
-                            <div>
-                                <span class="text-[10px] text-slate-500 block">抬餐學生起始座號</span>
-                                <select id="mealStartNumberSelect" onchange="updateDutySettings()" class="w-full px-1.5 py-0.5 border border-slate-300 rounded text-xs bg-white font-bold text-slate-800">
-                                    <option value="1">1號</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" id="dutySkipWeekendsToggle" checked onchange="updateDutySettings()" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                            <span class="text-[11px] text-slate-700 font-medium">自動鎖定星期六日 (放假)</span>
-                        </label>
-
-                        <div class="pt-1">
-                            <button onclick="openDutyExclusionModal()" class="w-full py-1 px-2 bg-white hover:bg-sky-100 text-sky-800 border border-sky-300 rounded text-xs font-bold transition flex items-center justify-center gap-1">
-                                <i data-lucide="user-x" class="w-3.5 h-3.5"></i> 設定值日生/抬餐排除學生名單
-                            </button>
-                        </div>
                     </div>
-
                 </div>
 
-                <!-- Duty Monthly Calendar Board View -->
-                <div id="dutyCalendarContainer" class="pt-1">
-                    <!-- Dynamic Month Calendar View -->
+                <!-- Duty Start Number Selectors Bar -->
+                <div id="dutyStartNumbersContainer" class="bg-amber-50/60 border border-amber-200 rounded-xl p-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="font-bold text-amber-950 mb-1 block">值日生輪派「起始學生」</label>
+                        <select id="dutyStartNumberSelect" onchange="updateDutySettings()" class="w-full px-2 py-1.5 border border-amber-300 rounded-lg text-xs bg-white font-bold focus:ring-1 focus:ring-amber-500"></select>
+                    </div>
+                    <div>
+                        <label class="font-bold text-amber-950 mb-1 block">抬餐學生輪派「起始學生」</label>
+                        <select id="mealStartNumberSelect" onchange="updateDutySettings()" class="w-full px-2 py-1.5 border border-amber-300 rounded-lg text-xs bg-white font-bold focus:ring-1 focus:ring-amber-500"></select>
+                    </div>
                 </div>
+
+                <!-- Toggles Bar -->
+                <div class="flex flex-wrap items-center gap-4 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
+                        <input type="checkbox" id="dutySkipWeekendsToggle" checked onchange="updateDutySettings()" class="rounded border-slate-300 text-sky-600">
+                        <span>預設自動跳過星期六、日不排班</span>
+                    </label>
+                    <label class="inline-flex items-center gap-1.5 cursor-pointer font-bold text-slate-700">
+                        <input type="checkbox" id="dutySameGenderToggle" onchange="updateDutySettings()" class="rounded border-slate-300 text-sky-600">
+                        <span>值日生設定同性別配對輪派 (男男/女女)</span>
+                    </label>
+                </div>
+
+                <!-- Duty Calendar Display Container -->
+                <div id="dutyCalendarContainer" class="pt-1"></div>
             </div>
 
-            <!-- Dedicated Printable Sheet for Duty & Meal Schedule -->
+            <!-- Dedicated Printable Duty Sheet Container -->
             <div id="dutyPrintableArea" class="duty-print-sheet bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
                 <div class="text-center pb-2 border-b-2 border-slate-800 flex flex-col items-center">
                     <h1 id="dutyPrintTitle" class="text-3xl font-black text-slate-900 tracking-wider">
                         新北市佳林國中 8年3班 值日生與抬餐學生輪值表
                     </h1>
-                    <div class="flex items-center gap-4 text-xs font-bold text-slate-600 mt-1">
-                        <span id="dutyPrintSubtitleDate">排班區間：2026年9月</span>
-                        <span id="dutyPrintSubtitleMeta">責任盡心 • 服務班級</span>
-                    </div>
+                    <p id="dutyPrintSubtitleDate" class="text-base font-bold text-slate-600 mt-1">排班區間：2026年 9月</p>
                 </div>
 
-                <!-- Print Options Toolbar for Duty (Hidden during print output) -->
-                <div class="no-print bg-slate-50 border border-slate-300 p-2.5 rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-slate-700">列印內容：</span>
-                        <select id="dutyPrintModeSelect" onchange="updateDutyPrintMode(this.value)" class="px-2 py-1 border border-slate-300 rounded bg-white font-bold">
+                <div class="flex items-center justify-between no-print text-xs bg-slate-100 p-2 rounded-lg border">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold">列印模式：</span>
+                        <select id="dutyPrintModeSelect" onchange="updateDutyPrintMode(this.value)" class="px-2 py-1 border rounded bg-white font-bold">
                             <option value="combined">合併列印 (值日生 + 抬餐生)</option>
                             <option value="dutyOnly">僅列印值日生</option>
                             <option value="mealOnly">僅列印抬餐學生</option>
                         </select>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-slate-700">列印方向：</span>
-                        <button onclick="setDutyPrintOrientation('portrait')" class="px-2.5 py-1 border rounded font-bold bg-white text-slate-700">直式</button>
-                        <button onclick="setDutyPrintOrientation('landscape')" class="px-2.5 py-1 border rounded font-bold bg-white text-slate-700">橫式</button>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold">列印方向：</span>
+                        <button onclick="setDutyPrintOrientation('portrait')" class="px-2 py-1 border rounded font-bold bg-white hover:bg-slate-50">直式</button>
+                        <button onclick="setDutyPrintOrientation('landscape')" class="px-2 py-1 border rounded font-bold bg-white hover:bg-slate-50">橫式</button>
                     </div>
                 </div>
 
-                <!-- Printable Calendar / Duty Table -->
-                <div id="dutyPrintTableContainer" class="overflow-x-auto">
-                    <!-- Dynamic Duty Print Table -->
-                </div>
+                <div id="dutyPrintTableContainer" class="overflow-x-auto"></div>
 
                 <div class="pt-4 flex justify-between items-center text-base font-bold text-slate-700 border-t border-slate-300">
-                    <span>衛生/衛生股長簽章：____________________</span>
+                    <span>衛生股長簽名：____________________</span>
                     <span>導師查核確認：____________________</span>
                 </div>
             </div>
@@ -833,7 +808,7 @@
              ========================================================================= -->
         <div id="tabContent-cleaning" class="tab-pane hidden flex flex-col gap-4">
             
-            <!-- Screen Management View (Hidden in print) -->
+            <!-- Screen Management View -->
             <div class="cleaning-screen-view bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
                     <div>
@@ -859,13 +834,11 @@
                     </div>
                 </div>
 
-                <!-- Unassigned Students Alert & Bar -->
                 <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs flex flex-wrap items-center justify-between gap-2">
                     <span class="font-medium text-slate-700">全班學生：<strong id="cleaningTotalCount" class="text-slate-900 font-bold">0</strong> 人 ｜ 已分配：<strong id="cleaningAssignedCount" class="text-emerald-700 font-bold">0</strong> 人 ｜ 未分配：<strong id="cleaningUnassignedCount" class="text-rose-600 font-bold">0</strong> 人</span>
                     <div id="unassignedChipsContainer" class="flex flex-wrap items-center gap-1 max-w-2xl"></div>
                 </div>
 
-                <!-- Cleaning Grid Cards Container -->
                 <div id="cleaningZonesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
@@ -903,7 +876,7 @@
         </div>
 
         <!-- =========================================================================
-             TAB 5: 學生分組工具 (Student Grouping Tool with Drag & Drop & Print)
+             TAB 5: 學生分組工具 (Student Grouping Tool)
              ========================================================================= -->
         <div id="tabContent-grouping" class="tab-pane hidden flex flex-col gap-4">
             
@@ -1006,7 +979,7 @@
                             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                                 <i data-lucide="tag" class="w-5 h-5 text-rose-500"></i> 學生桌牌產生器 (A4 橫向每頁 2 條)
                             </h2>
-                            <p class="text-xs text-slate-500 mt-0.5">座號與姓名佔滿桌牌 80% 區域，具備插圖自適應縮放、自選字體與零空白頁極致列印排版。</p>
+                            <p class="text-xs text-slate-500 mt-0.5">極致大字滿版列印，座號與姓名高度填滿桌牌高約 85%，列印保證無多餘空白頁。</p>
                         </div>
                         
                         <button onclick="printNameplates()" class="text-xs bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-lg transition flex items-center gap-1.5 shadow">
@@ -1014,7 +987,8 @@
                         </button>
                     </div>
 
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                    <!-- Customization Options Bar -->
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <div>
                             <label class="font-bold text-slate-700 mb-1 block">1. 桌牌邊框樣式</label>
                             <select id="nameplateBorderSelect" onchange="updateNameplateBorderStyle(this.value)" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white font-medium focus:ring-1 focus:ring-rose-500">
@@ -1035,30 +1009,6 @@
                                 <option value="'Noto Serif TC', 'PMingLiU', '新細明體', serif">思源宋體 / 明體 (書法風)</option>
                                 <option value="'Yuanti TC', 'Yuanti SC', '圓體', sans-serif">圓體 (圓潤親和)</option>
                             </select>
-                        </div>
-
-                        <div>
-                            <label class="font-bold text-slate-700 mb-1 block">3. 姓名右側插圖選項</label>
-                            <select id="nameplateAvatarSelect" onchange="updateNameplateAvatarMode(this.value)" class="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white font-medium focus:ring-1 focus:ring-rose-500">
-                                <option value="cuteAvatars">內建可愛學生頭像 (男女不同)</option>
-                                <option value="schoolMascots">內建活力吉祥物圖示 (男女不同)</option>
-                                <option value="none">無插圖 (純大座號與超長滿版姓名)</option>
-                                <option value="customUpload">自訂上傳插圖圖片</option>
-                            </select>
-                        </div>
-
-                        <div id="customAvatarUploadSection" class="space-y-1">
-                            <label class="font-bold text-slate-700 mb-1 block">4. 自訂上傳男女插圖</label>
-                            <div class="flex items-center gap-2">
-                                <label class="flex-1 py-1 px-1.5 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-300 rounded text-[11px] font-bold text-center cursor-pointer truncate shadow-2xs">
-                                    <span>上傳男生圖</span>
-                                    <input type="file" id="boyAvatarFileInput" accept="image/*" class="hidden" onchange="handleCustomAvatarUpload('boy', event)">
-                                </label>
-                                <label class="flex-1 py-1 px-1.5 bg-pink-50 hover:bg-pink-100 text-pink-800 border border-pink-300 rounded text-[11px] font-bold text-center cursor-pointer truncate shadow-2xs">
-                                    <span>上傳女生圖</span>
-                                    <input type="file" id="girlAvatarFileInput" accept="image/*" class="hidden" onchange="handleCustomAvatarUpload('girl', event)">
-                                </label>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1107,6 +1057,7 @@
     </div>
 
     <script>
+        // Core State
         let currentTab = 'seating';
         let students = [];
         let gridCols = 6;
@@ -1130,7 +1081,7 @@
         let customBoyAvatarData = null;
         let customGirlAvatarData = null;
 
-        // Structured Cadres & Assistants List (Tab 2)
+        // Structured Cadres List (Tab 2)
         let cadresList = [];
 
         // Duty & Meal Schedule State (Tab 3)
@@ -1162,6 +1113,7 @@
         let groupConstraints = [];
         let currentGroups = [];
 
+        // Toast Helper
         function showToast(msg, isError = false) {
             const toast = document.getElementById('toast');
             const toastMsg = document.getElementById('toastMsg');
@@ -1191,6 +1143,7 @@
             if (window.lucide) lucide.createIcons();
         });
 
+        // Tab Switcher
         function switchTab(tabId) {
             currentTab = tabId;
             document.body.setAttribute('data-active-tab', tabId);
@@ -1577,7 +1530,6 @@
             const dateList = getDateListForScheduling();
             if (dateList.length === 0) return;
 
-            // Filter out excluded students
             const dutyEligible = students.filter(s => !dutyExcludedStudents.duty.includes(s.number)).sort((a,b) => a.number - b.number);
             const mealEligible = students.filter(s => !dutyExcludedStudents.meal.includes(s.number)).sort((a,b) => a.number - b.number);
 
@@ -1614,7 +1566,7 @@
 
             dateList.forEach(dateKey => {
                 const dateObj = new Date(dateKey);
-                const dayOfWeek = dateObj.getDay(); // 0 is Sun, 6 is Sat
+                const dayOfWeek = dateObj.getDay();
                 const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
 
                 const lockInfo = dutyLockedDates[dateKey];
@@ -1641,7 +1593,6 @@
                     return;
                 }
 
-                // Manual Override check
                 if (dutyManualOverrides[dateKey]) {
                     dutyScheduleAssignments[dateKey] = {
                         isLocked: false,
@@ -1656,7 +1607,6 @@
                 const assignedMeal = [];
 
                 if (dutyScheduleSettings.assignmentMethod === 'sequence') {
-                    // Sequence Assignment
                     if (dutyScheduleSettings.sameGenderDuty) {
                         const targetPool = currentGenderGroup === '男' ? dutyMales : dutyFemales;
                         let p = currentGenderGroup === '男' ? malePointer : femalePointer;
@@ -1678,7 +1628,6 @@
                         }
                     }
 
-                    // Meal Sequence
                     if (mealEligible.length > 0) {
                         for (let i = 0; i < dutyScheduleSettings.mealCapacity; i++) {
                             assignedMeal.push(mealEligible[mealPointer % mealEligible.length].number);
@@ -1686,7 +1635,6 @@
                         }
                     }
                 } else {
-                    // Random Assignment
                     if (dutyEligible.length > 0) {
                         const shuffledDuty = [...dutyEligible].sort(() => Math.random() - 0.5);
                         for (let i = 0; i < Math.min(dutyScheduleSettings.dutyCapacity, shuffledDuty.length); i++) {
@@ -1734,7 +1682,7 @@
                             <i data-lucide="calendar-days" class="w-4 h-4 text-sky-600"></i> 排班月曆檢視 (${dateList.length} 天)
                         </h3>
                         <div class="text-xs text-slate-500 font-medium">
-                            💡 提示：點擊日期右上方鎖頭可放假/解鎖，點擊學生標籤可手動更換指派
+                            💡 提示：點擊日期右上方鎖頭可放假/解鎖，點擊「換人」可手動更換指派學生
                         </div>
                     </div>
 
@@ -1747,7 +1695,6 @@
                             const isWeekend = (dayOfWeekNum === 0 || dayOfWeekNum === 6);
 
                             const assignData = dutyScheduleAssignments[dateKey] || { isLocked: false, duty: [], meal: [] };
-                            const lockInfo = dutyLockedDates[dateKey];
                             const isLocked = assignData.isLocked;
 
                             return `
@@ -1810,31 +1757,23 @@
         function toggleDutyDateLockModal(dateKey) {
             const assignData = dutyScheduleAssignments[dateKey] || {};
             const isCurrentlyLocked = assignData.isLocked;
-            const currentReason = assignData.reason || '';
 
             if (isCurrentlyLocked) {
-                const choice = confirm(`日期 ${dateKey} 目前為鎖定放假日 (${currentReason})。\n\n按「確定」以解鎖此日開放排班，按「取消」保持鎖定。`);
-                if (choice) {
-                    const reasonNote = prompt(`請輸入此日活動/補課名稱 (可留空，如：校慶補課、園遊會)：`, '');
-                    dutyLockedDates[dateKey] = {
-                        locked: false,
-                        unlocked: true,
-                        reason: reasonNote || ''
-                    };
-                    executeDutyScheduling(false);
-                    showToast(`已解鎖日期 ${dateKey}！`);
-                }
+                dutyLockedDates[dateKey] = {
+                    locked: false,
+                    unlocked: true,
+                    reason: ''
+                };
+                executeDutyScheduling(false);
+                showToast(`已解鎖日期 ${dateKey}！`);
             } else {
-                const reason = prompt(`請輸入日期 ${dateKey} 放假/活動鎖定名稱：`, '國定假日放假');
-                if (reason !== null) {
-                    dutyLockedDates[dateKey] = {
-                        locked: true,
-                        unlocked: false,
-                        reason: reason || '放假不排班'
-                    };
-                    executeDutyScheduling(false);
-                    showToast(`已鎖定日期 ${dateKey} 為放假日！`);
-                }
+                dutyLockedDates[dateKey] = {
+                    locked: true,
+                    unlocked: false,
+                    reason: '放假不排班'
+                };
+                executeDutyScheduling(false);
+                showToast(`已鎖定日期 ${dateKey} 為放假日！`);
             }
         }
 
@@ -1857,7 +1796,7 @@
             };
 
             executeDutyScheduling(false);
-            showToast(`已成功手動微調 ${dateKey} 之排班！`);
+            showToast(`已手動更新 ${dateKey} 之指派人員！`);
         }
 
         function openDutyExclusionModal() {
@@ -1947,9 +1886,7 @@
                     <tbody>
                         ${dateList.map((dateKey, idx) => {
                             const dateObj = new Date(dateKey);
-                            const dayNum = dateObj.getDate();
                             const dayOfWeekNum = dateObj.getDay();
-                            const isWeekend = (dayOfWeekNum === 0 || dayOfWeekNum === 6);
 
                             const assignData = dutyScheduleAssignments[dateKey] || { isLocked: false, duty: [], meal: [] };
 
@@ -2419,37 +2356,11 @@
             renderNameplates();
         }
 
-        function updateNameplateAvatarMode(mode) {
-            nameplateAvatarMode = mode;
-            renderNameplates();
-        }
-
         function changeNameplateFont(fontVal) {
             applyFont(fontVal);
             document.getElementById('fontFamilySelect').value = fontVal;
             renderNameplates();
             showToast('已切換桌牌列印字體！');
-        }
-
-        function handleCustomAvatarUpload(gender, event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (gender === 'boy') {
-                    customBoyAvatarData = e.target.result;
-                    showToast('成功上傳男生自訂插圖！');
-                } else {
-                    customGirlAvatarData = e.target.result;
-                    showToast('成功上傳女生自訂插圖！');
-                }
-                nameplateAvatarMode = 'customUpload';
-                document.getElementById('nameplateAvatarSelect').value = 'customUpload';
-                renderNameplates();
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
         }
 
         function getDeskStripBorderClass(gender, style) {
@@ -2466,98 +2377,6 @@
             }
         }
 
-        function getNameFontSizeClass(name, hasAvatar) {
-            const len = (name || '').trim().length;
-            if (!hasAvatar) {
-                if (len <= 2) return 'text-[6.8rem] sm:text-[7.6rem] lg:text-[8.2rem]';
-                if (len === 3) return 'text-[5.8rem] sm:text-[6.8rem] lg:text-[7.4rem]';
-                if (len === 4) return 'text-[4.8rem] sm:text-[5.5rem] lg:text-[6rem]';
-                return 'text-[3.8rem] sm:text-[4.5rem] lg:text-[5rem]';
-            } else {
-                if (len <= 2) return 'text-[5.4rem] sm:text-[6.2rem] lg:text-[6.8rem]';
-                if (len === 3) return 'text-[4.4rem] sm:text-[5.2rem] lg:text-[5.8rem]';
-                if (len === 4) return 'text-[3.4rem] sm:text-[4.2rem] lg:text-[4.8rem]';
-                return 'text-[2.8rem] sm:text-[3.4rem] lg:text-[3.8rem]';
-            }
-        }
-
-        function getStudentAvatarHTML(gender) {
-            if (nameplateAvatarMode === 'none') {
-                return '';
-            }
-
-            if (nameplateAvatarMode === 'customUpload') {
-                const imgData = gender === '男' ? customBoyAvatarData : customGirlAvatarData;
-                if (imgData) {
-                    return `
-                        <div class="flex-shrink-0 w-[74mm] h-[74mm] flex items-center justify-center p-1">
-                            <img src="${imgData}" class="max-w-full max-h-full object-contain rounded-2xl drop-shadow-sm" alt="插圖">
-                        </div>
-                    `;
-                }
-            }
-
-            if (nameplateAvatarMode === 'schoolMascots') {
-                if (gender === '男') {
-                    return `
-                        <div class="flex-shrink-0 w-[74mm] h-[74mm] flex items-center justify-center">
-                            <svg class="w-full h-full text-sky-600 drop-shadow-sm" viewBox="0 0 100 100" fill="currentColor">
-                                <circle cx="50" cy="50" r="44" fill="#e0f2fe" stroke="#0284c7" stroke-width="4"/>
-                                <path d="M50 20 L58 38 L78 38 L62 50 L68 70 L50 56 L32 70 L38 50 L22 38 L42 38 Z" fill="#0284c7"/>
-                                <circle cx="50" cy="48" r="8" fill="#fef08a"/>
-                            </svg>
-                        </div>
-                    `;
-                } else {
-                    return `
-                        <div class="flex-shrink-0 w-[74mm] h-[74mm] flex items-center justify-center">
-                            <svg class="w-full h-full text-rose-500 drop-shadow-sm" viewBox="0 0 100 100" fill="currentColor">
-                                <circle cx="50" cy="50" r="44" fill="#ffe4e6" stroke="#f43f5e" stroke-width="4"/>
-                                <circle cx="50" cy="50" r="14" fill="#f43f5e"/>
-                                <circle cx="50" cy="28" r="10" fill="#fb7185"/>
-                                <circle cx="50" cy="72" r="10" fill="#fb7185"/>
-                                <circle cx="28" cy="50" r="10" fill="#fb7185"/>
-                                <circle cx="72" cy="50" r="10" fill="#fb7185"/>
-                                <circle cx="50" cy="50" r="6" fill="#fef08a"/>
-                            </svg>
-                        </div>
-                    `;
-                }
-            }
-
-            if (gender === '男') {
-                return `
-                    <div class="flex-shrink-0 w-[74mm] h-[74mm] flex items-center justify-center">
-                        <svg class="w-full h-full drop-shadow-sm" viewBox="0 0 120 120">
-                            <circle cx="60" cy="60" r="54" fill="#e0f2fe" stroke="#0369a1" stroke-width="5"/>
-                            <path d="M35 52 Q60 20 85 52" fill="#1e293b"/>
-                            <circle cx="60" cy="65" r="28" fill="#fed7aa"/>
-                            <circle cx="50" cy="62" r="4" fill="#0f172a"/>
-                            <circle cx="70" cy="62" r="4" fill="#0f172a"/>
-                            <path d="M52 76 Q60 84 68 76" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
-                            <path d="M38 108 Q60 92 82 108" fill="#0284c7"/>
-                        </svg>
-                    </div>
-                `;
-            } else {
-                return `
-                    <div class="flex-shrink-0 w-[74mm] h-[74mm] flex items-center justify-center">
-                        <svg class="w-full h-full drop-shadow-sm" viewBox="0 0 120 120">
-                            <circle cx="60" cy="60" r="54" fill="#fce7f3" stroke="#be185d" stroke-width="5"/>
-                            <circle cx="32" cy="46" r="10" fill="#be185d"/>
-                            <circle cx="88" cy="46" r="10" fill="#be185d"/>
-                            <path d="M36 54 Q60 22 84 54" fill="#475569"/>
-                            <circle cx="60" cy="66" r="28" fill="#fed7aa"/>
-                            <circle cx="50" cy="64" r="4" fill="#0f172a"/>
-                            <circle cx="70" cy="64" r="4" fill="#0f172a"/>
-                            <path d="M52 78 Q60 86 68 78" stroke="#0f172a" stroke-width="3" fill="none" stroke-linecap="round"/>
-                            <path d="M38 108 Q60 92 82 108" fill="#e11d48"/>
-                        </svg>
-                    </div>
-                `;
-            }
-        }
-
         function renderNameplates() {
             const container = document.getElementById('nameplatesPrintContainer');
             if (!container) return;
@@ -2568,7 +2387,6 @@
             }
 
             const sorted = [...students].sort((a,b) => a.number - b.number);
-            const hasAvatar = nameplateAvatarMode !== 'none';
 
             const pages = [];
             for (let i = 0; i < sorted.length; i += 2) {
@@ -2576,31 +2394,29 @@
             }
 
             container.innerHTML = pages.map((pair) => `
-                <div class="nameplate-sheet-page bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <div class="nameplate-sheet-page bg-white p-2 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
                     ${pair.map((st, sIdx) => {
                         const stripBorder = getDeskStripBorderClass(st.gender, nameplateBorderStyle);
                         const numberBoxBorder = st.gender === '男' 
-                            ? 'border-8 border-sky-500 text-sky-600 bg-sky-50/70' 
-                            : 'border-8 border-rose-500 text-rose-600 bg-rose-50/70';
+                            ? 'border-[7px] border-sky-500 text-sky-600 bg-sky-50/70' 
+                            : 'border-[7px] border-rose-500 text-rose-600 bg-rose-50/70';
 
-                        const avatarHTML = getStudentAvatarHTML(st.gender);
-                        const nameFontClass = getNameFontSizeClass(st.name, hasAvatar);
+                        const nameLength = (st.name || '').trim().length;
+                        const nameFontSize = nameLength <= 2 ? '56mm' : (nameLength === 3 ? '48mm' : '38mm');
 
                         return `
-                            <div class="relative w-full h-[92mm] ${stripBorder} rounded-2xl p-2.5 flex items-center justify-between bg-white overflow-hidden shadow-2xs" style="font-family: ${currentFontFamily};">
-                                <div class="flex-shrink-0 w-[84mm] h-[84mm] rounded-3xl ${numberBoxBorder} flex items-center justify-center shadow-xs">
-                                    <span class="text-[6.2rem] lg:text-[7.4rem] font-black font-mono leading-none tracking-tighter">
+                            <div class="relative w-full h-[91mm] ${stripBorder} rounded-2xl p-2 flex items-center justify-between bg-white overflow-hidden shadow-2xs" style="font-family: ${currentFontFamily};">
+                                <div class="flex-shrink-0 w-[82mm] h-[82mm] rounded-2xl ${numberBoxBorder} flex items-center justify-center shadow-xs">
+                                    <span class="font-black font-mono leading-none tracking-tighter" style="font-size: 58mm;">
                                         ${st.number}
                                     </span>
                                 </div>
 
-                                <div class="flex-1 h-[84mm] flex items-center justify-center text-center px-2 overflow-hidden">
-                                    <span class="${nameFontClass} font-black tracking-widest text-slate-900 leading-none truncate whitespace-nowrap">
+                                <div class="flex-1 h-[82mm] flex items-center justify-center text-center px-2 overflow-hidden">
+                                    <span class="font-black tracking-widest text-slate-900 leading-none truncate whitespace-nowrap" style="font-size: ${nameFontSize}; font-weight: 900;">
                                         ${st.name}
                                     </span>
                                 </div>
-
-                                ${avatarHTML}
                             </div>
 
                             ${sIdx === 0 && pair.length > 1 ? `
