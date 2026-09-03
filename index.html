@@ -531,6 +531,23 @@
                         </div>
                     </div>
 
+                    <!-- Section 5: Student Remarks Display Switch -->
+                    <div class="space-y-1.5 bg-indigo-50/60 p-2.5 rounded-xl border border-indigo-200">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-indigo-950 flex items-center gap-1 cursor-pointer" for="showRemarksToggle">
+                                <i data-lucide="tags" class="w-4 h-4 text-indigo-600"></i>
+                                <span>顯示學生備註符號</span>
+                            </label>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="showRemarksToggle" checked class="sr-only peer" onchange="toggleShowRemarkSymbols(this.checked)">
+                                <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-indigo-700 leading-tight">
+                            於座位座號右側同步呈現分類符號（如 ★、◆），並於底部印出說明圖例。
+                        </p>
+                    </div>
+
                 </div>
             </aside>
 
@@ -601,6 +618,15 @@
 
                         </div>
 
+                        <!-- Row 3: 學生特殊備註圖例說明列 (任課教師專用) -->
+                        <div id="remarkLegendContainer" class="w-full bg-indigo-50/70 border border-indigo-200 rounded-lg px-2.5 py-1 text-xs text-indigo-950 flex flex-wrap items-center gap-2 shadow-2xs transition-all">
+                            <span class="font-extrabold flex items-center gap-1 text-indigo-900 whitespace-nowrap">
+                                <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-600"></i>
+                                <span>【學生特殊備註】</span>
+                            </span>
+                            <div id="remarkLegendItems" class="flex flex-wrap items-center gap-2.5 flex-1 font-medium"></div>
+                        </div>
+
                     </div>
 
                 </div>
@@ -660,6 +686,34 @@
                         <div id="assistantsListContainer" class="space-y-2 max-h-[550px] overflow-y-auto pr-1"></div>
                     </div>
                 </div>
+
+                <!-- Section 3: 學生特殊備註與分類管理 (供任課教師快速掌握) -->
+                <div class="bg-indigo-50/40 border border-indigo-200 rounded-xl p-4 space-y-3 mt-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-indigo-200/80 pb-2">
+                        <div>
+                            <h3 class="font-bold text-sm text-indigo-950 flex items-center gap-1.5">
+                                <i data-lucide="tags" class="w-4 h-4 text-indigo-600"></i> 學生特殊備註與分類管理（任課教師教學參考）
+                            </h3>
+                            <p class="text-[11px] text-indigo-700 mt-0.5">
+                                可自訂分類（如：資源班、視力前排、原住民、體育校隊等）並選用 5 種符號，標示將同步顯示於座位表座號右方。
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-bold text-indigo-900">
+                                <input type="checkbox" id="tab2ShowRemarksCheckbox" checked onchange="toggleShowRemarkSymbols(this.checked)" class="rounded border-indigo-300 text-indigo-600">
+                                <span>在座位表顯示備註符號</span>
+                            </label>
+                            <button onclick="addNewRemarkCategory()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow-xs">
+                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> 新增備註分類
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="studentRemarksListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 pt-1">
+                        <!-- Injected dynamically via JS -->
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -1084,6 +1138,14 @@
         // Structured Cadres List (Tab 2)
         let cadresList = [];
 
+        // Student Remarks Categories & Display Toggle
+        let showRemarkSymbols = true;
+        const REMARK_SYMBOLS_PRESET = ['★', '◆', '▲', '●', '✿'];
+        let studentRemarks = [
+            { id: 'rem_1', name: '資源班特教生', symbol: '★', studentNumbers: [3] },
+            { id: 'rem_2', name: '視力保健需前排', symbol: '◆', studentNumbers: [5] }
+        ];
+
         // Duty & Meal Schedule State (Tab 3)
         let dutyScheduleSettings = {
             rangeMode: 'month',
@@ -1279,6 +1341,8 @@
             renderGrid();
             renderCadresDisplayOnSeating();
             renderCadresManager();
+            renderStudentRemarksManager();
+            renderRemarkLegend();
             renderDutyStartSelectOptions();
             executeDutyScheduling(false);
             renderCleaningZones();
@@ -1323,7 +1387,178 @@
                 : '<div class="text-xs text-emerald-800/70 italic text-center py-4">尚未設定小老師</div>';
 
             renderCadresDisplayOnSeating();
+            renderStudentRemarksManager();
+            renderRemarkLegend();
             if (window.lucide) lucide.createIcons();
+        }
+
+        // =========================================================================
+        // TAB 2: 學生特殊備註與分類管理邏輯
+        // =========================================================================
+        function toggleShowRemarkSymbols(enabled) {
+            showRemarkSymbols = !!enabled;
+            const toggleTab1 = document.getElementById('showRemarksToggle');
+            const toggleTab2 = document.getElementById('tab2ShowRemarksCheckbox');
+            if (toggleTab1) toggleTab1.checked = showRemarkSymbols;
+            if (toggleTab2) toggleTab2.checked = showRemarkSymbols;
+
+            renderGrid();
+            renderRemarkLegend();
+            showToast(showRemarkSymbols ? '已開啟座位表備註符號顯示！' : '已關閉座位表備註符號顯示。');
+        }
+
+        function renderStudentRemarksManager() {
+            const container = document.getElementById('studentRemarksListContainer');
+            if (!container) return;
+
+            if (studentRemarks.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-4 text-center text-xs text-indigo-400 italic">尚未建立任何備註分類，點擊右上角「新增備註分類」即可建立。</div>`;
+                return;
+            }
+
+            const sortedStudents = [...students].sort((a, b) => a.number - b.number);
+
+            container.innerHTML = studentRemarks.map(rem => {
+                return `
+                    <div class="bg-white border border-indigo-200 rounded-xl p-3 flex flex-col justify-between space-y-2 shadow-2xs hover:border-indigo-400 transition">
+                        <div class="flex items-center gap-1.5 pb-1.5 border-b border-indigo-100">
+                            <!-- 符號選擇下拉 (5種符號) -->
+                            <select onchange="updateRemarkCategory('${rem.id}', 'symbol', this.value)" class="w-14 px-1 py-1 border border-indigo-300 rounded font-black text-sm text-center bg-indigo-50 text-indigo-900 focus:ring-1 focus:ring-indigo-500 cursor-pointer" title="更換備註符號">
+                                ${REMARK_SYMBOLS_PRESET.map(sym => `
+                                    <option value="${sym}" ${sym === rem.symbol ? 'selected' : ''}>${sym}</option>
+                                `).join('')}
+                            </select>
+
+                            <!-- 自訂分類名稱 -->
+                            <input type="text" value="${rem.name}" oninput="updateRemarkCategory('${rem.id}', 'name', this.value)" placeholder="分類名稱 (如: 資源班)" class="flex-1 px-2 py-1 border border-slate-300 rounded text-xs font-bold text-indigo-950 focus:ring-1 focus:ring-indigo-500">
+
+                            <!-- 刪除此分類 -->
+                            <button onclick="deleteRemarkCategory('${rem.id}')" class="text-slate-400 hover:text-red-600 p-1 hover:bg-red-50 rounded transition" title="刪除此分類">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+
+                        <!-- 已指派學生名單標籤 -->
+                        <div class="flex flex-wrap gap-1 min-h-[38px] p-1.5 bg-slate-50/70 rounded-lg border border-slate-200/80 items-center">
+                            ${rem.studentNumbers.map(num => {
+                                const st = students.find(s => s.number === num);
+                                if (!st) return '';
+                                return `
+                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold ${st.gender === '男' ? 'bg-sky-100 text-sky-800 border-sky-300' : 'bg-pink-100 text-pink-800 border-pink-300'} border">
+                                        ${st.number}.${st.name}
+                                        <button onclick="removeStudentFromRemark('${rem.id}', ${st.number})" class="opacity-60 hover:opacity-100 hover:text-red-600 ml-0.5 font-bold">✕</button>
+                                    </span>
+                                `;
+                            }).join('') || '<span class="text-[10px] text-slate-400 italic">尚未加入學生</span>'}
+                        </div>
+
+                        <!-- 下拉加入學生 -->
+                        <div class="pt-0.5">
+                            <select onchange="addStudentToRemark('${rem.id}', this.value); this.value='';" class="w-full px-2 py-1 border border-slate-300 rounded text-xs bg-white text-slate-700">
+                                <option value="">＋ 選擇學生加入此分類...</option>
+                                ${sortedStudents.map(s => `
+                                    <option value="${s.number}" ${rem.studentNumbers.includes(s.number) ? 'disabled class="text-slate-300"' : ''}>
+                                        ${s.number}號 ${s.name} ${rem.studentNumbers.includes(s.number) ? '(已在此分類)' : ''}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function addNewRemarkCategory() {
+            const usedSymbols = studentRemarks.map(r => r.symbol);
+            const availableSymbol = REMARK_SYMBOLS_PRESET.find(sym => !usedSymbols.includes(sym)) || REMARK_SYMBOLS_PRESET[0];
+            const newId = 'rem_' + Date.now();
+
+            studentRemarks.push({
+                id: newId,
+                name: '新增備註分類',
+                symbol: availableSymbol,
+                studentNumbers: []
+            });
+
+            renderStudentRemarksManager();
+            renderRemarkLegend();
+            renderGrid();
+        }
+
+        function deleteRemarkCategory(id) {
+            studentRemarks = studentRemarks.filter(r => r.id !== id);
+            renderStudentRemarksManager();
+            renderRemarkLegend();
+            renderGrid();
+            showToast('已刪除該備註分類！');
+        }
+
+        function updateRemarkCategory(id, field, value) {
+            const rem = studentRemarks.find(r => r.id === id);
+            if (rem) {
+                rem[field] = value;
+                renderRemarkLegend();
+                renderGrid();
+            }
+        }
+
+        function addStudentToRemark(remId, studentNumberStr) {
+            if (!studentNumberStr) return;
+            const num = parseInt(studentNumberStr, 10);
+            const rem = studentRemarks.find(r => r.id === remId);
+            if (rem && !rem.studentNumbers.includes(num)) {
+                rem.studentNumbers.push(num);
+                rem.studentNumbers.sort((a,b) => a - b);
+                renderStudentRemarksManager();
+                renderRemarkLegend();
+                renderGrid();
+            }
+        }
+
+        function removeStudentFromRemark(remId, studentNumber) {
+            const rem = studentRemarks.find(r => r.id === remId);
+            if (rem) {
+                rem.studentNumbers = rem.studentNumbers.filter(n => n !== studentNumber);
+                renderStudentRemarksManager();
+                renderRemarkLegend();
+                renderGrid();
+            }
+        }
+
+        function renderRemarkLegend() {
+            const legendContainer = document.getElementById('remarkLegendContainer');
+            const legendItems = document.getElementById('remarkLegendItems');
+            if (!legendContainer || !legendItems) return;
+
+            if (!showRemarkSymbols || studentRemarks.length === 0) {
+                legendContainer.classList.add('hidden');
+                return;
+            }
+
+            legendContainer.classList.remove('hidden');
+
+            const activeRemarks = studentRemarks.filter(r => r.studentNumbers.length > 0 || r.name.trim());
+            if (activeRemarks.length === 0) {
+                legendItems.innerHTML = '<span class="text-indigo-400 italic">（暫無分類項目）</span>';
+                return;
+            }
+
+            legendItems.innerHTML = activeRemarks.map(rem => {
+                const names = rem.studentNumbers.map(n => {
+                    const st = students.find(s => s.number === n);
+                    return st ? `${st.number}號` : '';
+                }).filter(Boolean).join('、');
+
+                return `
+                    <span class="inline-flex items-center gap-1 bg-white/90 border border-indigo-200 px-2 py-0.5 rounded shadow-2xs">
+                        <strong class="text-amber-700 font-mono text-sm leading-none">${rem.symbol}</strong>
+                        <span class="font-bold text-slate-800">${rem.name}</span>
+                        ${names ? `<span class="text-[10px] text-indigo-600 font-normal">(${names})</span>` : ''}
+                    </span>
+                `;
+            }).join('');
         }
 
         function addNewRoleRow(type) {
@@ -2781,6 +3016,12 @@
                         seatCard.setAttribute('draggable', 'true');
 
                         if (student) {
+                            // Find student remarks and format symbols
+                            const assignedRemarks = studentRemarks.filter(rem => rem.studentNumbers.includes(student.number));
+                            const remarkSymbolsHTML = (showRemarkSymbols && assignedRemarks.length > 0)
+                                ? `<span class="inline-flex items-center gap-0.5 ml-1 text-amber-700 font-extrabold text-sm tracking-tight" title="${assignedRemarks.map(r => r.name).join('、')}">${assignedRemarks.map(r => r.symbol).join('')}</span>`
+                                : '';
+
                             seatCard.innerHTML = `
                                 <div class="w-full flex justify-between items-center text-[9px] font-mono leading-none">
                                     <span class="font-bold opacity-60" title="排-欄">${r}-${c} ${dirArrow}</span>
@@ -2795,8 +3036,9 @@
                                 <div class="seat-name text-center font-black tracking-wider text-slate-900 my-auto leading-tight">
                                     ${student.name}
                                 </div>
-                                <div class="seat-number font-bold opacity-85 leading-none">
-                                    ${student.number} 號
+                                <div class="seat-number font-bold opacity-85 leading-none flex items-center justify-center">
+                                    <span>${student.number} 號</span>
+                                    ${remarkSymbolsHTML}
                                 </div>
                             `;
                         } else {
@@ -2823,6 +3065,7 @@
             }
 
             updateSummary();
+            renderRemarkLegend();
             if (window.lucide) lucide.createIcons();
         }
 
@@ -3132,6 +3375,9 @@
             cadresList.forEach(c => {
                 if (c.studentNumber === targetStudent.number) c.studentNumber = 0;
             });
+            studentRemarks.forEach(rem => {
+                rem.studentNumbers = rem.studentNumbers.filter(n => n !== targetStudent.number);
+            });
             cleaningZones.forEach(z => {
                 z.studentNumbers = z.studentNumbers.filter(n => n !== targetStudent.number);
             });
@@ -3142,6 +3388,8 @@
             renderRoster();
             renderGrid();
             renderCadresManager();
+            renderStudentRemarksManager();
+            renderRemarkLegend();
             renderDutyStartSelectOptions();
             executeDutyScheduling(false);
             renderCleaningZones();
@@ -3383,6 +3631,16 @@
                 gridData.push([`${c.title}：${st ? st.name : '（未指派）'}`]);
             });
 
+            gridData.push([]);
+            gridData.push(["【學生特殊備註分類】"]);
+            studentRemarks.forEach(rem => {
+                const members = rem.studentNumbers.map(n => {
+                    const st = students.find(s => s.number === n);
+                    return st ? `${st.number}號 ${st.name}` : '';
+                }).filter(Boolean).join('、');
+                gridData.push([`[${rem.symbol}] ${rem.name}：${members || '（無）'}`]);
+            });
+
             const wsGrid = XLSX.utils.aoa_to_sheet(gridData);
             XLSX.utils.book_append_sheet(wb, wsGrid, "教室座位表");
 
@@ -3457,6 +3715,8 @@
                 customBoyAvatarData,
                 customGirlAvatarData,
                 cadresList,
+                studentRemarks,
+                showRemarkSymbols,
                 dutyScheduleSettings,
                 dutyLockedDates,
                 dutyExcludedStudents,
@@ -3534,6 +3794,13 @@
                     customGirlAvatarData = data.customGirlAvatarData || null;
 
                     cadresList = data.cadresList || [];
+                    studentRemarks = data.studentRemarks || [];
+                    showRemarkSymbols = data.showRemarkSymbols !== undefined ? data.showRemarkSymbols : true;
+                    const toggleTab1 = document.getElementById('showRemarksToggle');
+                    const toggleTab2 = document.getElementById('tab2ShowRemarksCheckbox');
+                    if (toggleTab1) toggleTab1.checked = showRemarkSymbols;
+                    if (toggleTab2) toggleTab2.checked = showRemarkSymbols;
+
                     dutyScheduleSettings = data.dutyScheduleSettings || dutyScheduleSettings;
                     dutyLockedDates = data.dutyLockedDates || {};
                     dutyExcludedStudents = data.dutyExcludedStudents || { duty: [], meal: [] };
@@ -3557,6 +3824,8 @@
                     renderRoster();
                     renderGrid();
                     renderCadresManager();
+                    renderStudentRemarksManager();
+                    renderRemarkLegend();
                     renderDutyStartSelectOptions();
                     executeDutyScheduling(false);
                     renderCleaningZones();
